@@ -39,7 +39,6 @@ for (const field of textFieldMap.values()) {
     interactions.set(
         getModalSubmitId(field),
         async (interaction) => {
-            console.log(interaction);
             return await fieldEditSubmit(interaction, field)
         }
     );
@@ -61,7 +60,7 @@ async function fieldEditOpen(interaction, field) {
     const panel = findPanel(interaction.user.id);
     if (!panel) return await interaction.reply(noPanelMsg);
 
-    const fieldState = panel.getState()
+    const fieldState = panel.getFieldState(field.id);
     if (!fieldState) return console.log(`FieldState ${field.id} not found!`);
 
     return await interaction.showModal(
@@ -76,7 +75,7 @@ async function toggleField(interaction, field) {
     const panel = findPanel(interaction.user.id);
     if (!panel) return await interaction.reply(noPanelMsg);
 
-    const fieldState = panel.fieldStates.find(state => state.field.id === field.id) || null;
+    const fieldState = panel.getFieldState(field.id) || null;
     if (!fieldState) return console.log(`FieldState ${field.id} not found!`);
 
     interaction.deferUpdate();
@@ -89,12 +88,11 @@ async function toggleField(interaction, field) {
 
     const embed = buildEmbed(panel.server ? false : true, panel.serverName, panel.fieldStates);
 
-    console.log("Updating...")
     await interaction.message.edit({
         embeds: [embed],
         components: interaction.message.components
     })
-    console.log("Updated")
+
 }
 
 async function fieldEditSubmit(interaction, field) {
@@ -108,12 +106,16 @@ async function fieldEditSubmit(interaction, field) {
     const panel = findPanel(interaction.user.id);
     if (!panel) return await interaction.reply(noPanelMsg);
 
-    const fieldState = panel.fieldStates.find(state => state.field.id === field.id) || null;
+    const fieldState = panel.getFieldState(field.id);
     if (!fieldState) return console.log(`FieldState ${field.id} not found!`);
 
-    const input = interaction.fields.getTextInputValue('value');
+    let input = interaction.fields.getTextInputValue('value');
 
-    fieldState.value = input;//todo requires cleaning ?
+    if (field.id === 'server_name') {
+        input = cleanInput(input).toLowerCase();
+    }
+    if (input.length == 0) return await interaction.reply({ content: "Given input invalid!", flags: MessageFlags.Ephemeral });
+    fieldState.value = input;
 
 
 
@@ -239,7 +241,27 @@ interactions.set(EDIT_SUBMIT,
         const panel = findPanel(interaction.user.id);
         if (!panel) return await interaction.reply(noPanelMsg);
 
-        //todo save changes
+        const name = panel.getFieldState('server_name').value;
+        const title = panel.getFieldState('server_title').value;
+        const ipAddress = panel.getFieldState('server_ip').value;
+        const description = panel.getFieldState('server_description').value;
+        const modpackVersion = panel.getFieldState('modpack_version').value;
+
+        const modpackURL = panel.getFieldState('modpack_url').value;
+        const modLoader = panel.getFieldState('mod_loader').value;
+        const minecraftVersion = panel.getFieldState('minecraft_version').value;
+        const panelID = panel.getFieldState('panel_id').value;
+
+        const whitelistRequired = panel.getFieldState('whitelist_required').value;
+        const hidden = panel.getFieldState('server_hidden').value;
+
+
+        SERVER_MANAGER.modifyServer(panel.serverName,
+            name, title, description, panelID, ipAddress,
+            modpackURL, modpackVersion, modLoader,
+            minecraftVersion, whitelistRequired, hidden
+        );
+
 
         await interaction.message.edit({
             content: `Editor Closed - Changes Saved`,
