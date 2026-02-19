@@ -11,7 +11,10 @@
   "author": "Spudacious",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^13.17.1",
-    "dotenv": "^17.2.4"
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.4",
+    "pterodactyl-api-wrapper": "^2.0.8",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
   }
 }
