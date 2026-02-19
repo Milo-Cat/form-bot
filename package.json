@@ -1,0 +1,17 @@
+{
+  "name": "form-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Spudacious",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.17.1",
+    "dotenv": "^17.2.4"
+  }
+}
