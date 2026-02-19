@@ -15,7 +15,7 @@ class Panel {
         this.fieldStates = fieldStates;
     }
 
-    getState(stateID) {
+    getFieldState(stateID) {
         return this.fieldStates.find(state => state.field.id === stateID) || null;
     }
 }
