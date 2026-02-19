@@ -42,7 +42,7 @@ class TextField extends Field {
 						.setLabel(this.buttonText)
 						.setStyle(ButtonStyle.Secondary);
         
-        if(textActionRowOne.components.length < 4){
+        if(textActionRowOne.components.length < 5){
             textActionRowOne.addComponents(button);
         } else {
             textActionRowTwo.addComponents(button);
@@ -92,7 +92,8 @@ class BoolField extends Field {
     getType() { return 'bool' }
 }
 
-new TextField('server_name', 'name', 'Server Name', 'The name of the server.', '', 'Edit Name');
+new TextField('server_name', 'name', 'Server Name (Internal)', 'The name of the server.', '', 'Edit Internal Name');
+new TextField('server_title', 'title', 'Server Title', 'The full title of the server.', '', 'Edit Title');
 new TextField('server_ip', 'ipAddress', 'Server IP', 'The IP address of the server.', '.farwater.de', 'Edit IP');
 new TextField('server_description', 'description', 'Server Description', 'Do I need to describe descriptions?', 'A Farwater Server', 'Edit Description');
 new TextField('modpack_version', 'modpackVersion', 'Modpack Version', 'The version of the modpack.', '1.0.0', 'Edit Pack Version');

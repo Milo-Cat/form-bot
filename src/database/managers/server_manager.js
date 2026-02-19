@@ -9,7 +9,11 @@ module.exports.findServer = async (serverName) => {
     });
 }
 
-module.exports.modifyServer = async (old_name, name, description, panelID, ipAddress, modpackURL, modpackVersion, modLoader, minecraftVersion, whitelistRequired, hidden) => {
+module.exports.modifyServer = async (old_name, name, title, description, panelID, ipAddress, modpackURL, modpackVersion, modLoader, minecraftVersion, whitelistRequired, hidden) => {
+
+    if(!title || title.length == 0){
+        title = name;
+    }
 
     let server;
     if(old_name) {
@@ -19,6 +23,7 @@ module.exports.modifyServer = async (old_name, name, description, panelID, ipAdd
     if (server) {
         //update existing server
         server.name = name;
+        server.title = title;
         server.panelID = panelID;
         server.ipAddress = ipAddress;
         server.modpackURL = modpackURL;
@@ -32,6 +37,7 @@ module.exports.modifyServer = async (old_name, name, description, panelID, ipAdd
     } else {
         server = await Server.create({
             name: name,
+            title: title,
             description: description,
             panelID: panelID,
             ipAddress: ipAddress,

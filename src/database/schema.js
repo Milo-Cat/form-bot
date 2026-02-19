@@ -168,6 +168,11 @@ const Server = sequelize.define(
             allowNull: false,
             unique: true,
         },
+        title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'Server Title'
+        },
         description: {
             type: DataTypes.TEXT,
             allowNull: true,
