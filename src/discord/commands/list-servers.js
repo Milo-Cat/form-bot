@@ -1,21 +1,11 @@
 const {
-    SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder,
-    ButtonBuilder, ButtonStyle, ButtonInteraction, ModalBuilder,
-    TextInputBuilder, LabelBuilder, TextDisplayBuilder, StringSelectMenuOptionBuilder,
-    TextInputStyle, MessageFlags, EmbedBuilder,
-    messageLink
+    SlashCommandBuilder, EmbedBuilder
 } = require('discord.js');
-const UTILITY = require('../../cmnd_resources.js');
-const { cleanInput, cleanIntegerInput } = UTILITY.CLEANERS;
+const UTILITY = require('../cmnd_resources.js');
 const { USER_MANAGER,
     SERVER_MANAGER
 } = UTILITY.DATABASE;
-const { RANKS } = UTILITY.DATABASE.SCHEMA;
 
-const { textFieldMap, boolFieldMap, getInteractId, getModalSubmitId,
-    textActionRowOne, textActionRowTwo, boolActionRow } = require('./editable-fields.js');
-
-const { timestamp, initialiseEditor, findPanel, cleanOldPanels, removePanel } = require('./panels_backend.js');
 
 const { FABRIC, FORGE, NEOFORGE, MODRINTH, CURSEFORGE } = require('../emojis.js');
 
