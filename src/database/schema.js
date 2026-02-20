@@ -437,7 +437,6 @@ module.exports = {
     User,
     WhitelistApplication,
     Server,
-    ServerViewableToRank,
     Rank,
     Infraction,
     Punishment,
