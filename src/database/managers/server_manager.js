@@ -83,8 +83,35 @@ module.exports.isServerHiddenToUser = async (server, user) => {
     return hiddenServers.includes(server.name);
 }
 
-module.exports.gatherUnhiddenServers = async () => {
-    return await Server.findAll({ where: { hidden: false } });
+module.exports.gatherViewableServers = async (user) => {//USER as in user record. Is nullable
+
+    if(!user){
+        return await Server.findAll({ where: { hidden: false } });
+    }
+
+    const userRanks = await user.getRanks();
+
+    const userRankIds = userRanks.map(r => r.id);
+
+    return await rankViewableServers(userRankIds);
+}
+
+async function rankViewableServers(userRankIds) {
+    
+    const [unhiddenServers, hiddenServers] = await Promise.all([
+        Server.findAll({ where: { hidden: false } }),
+        Server.findAll({
+            where: { hidden: true },
+            include: [{
+                model: Rank,
+                where: { id: userRankIds },
+                through: { attributes: [] }
+            }]
+        })
+    ]);
+
+    const allViewable = [...unhiddenServers, ...hiddenServers];
+    return allViewable;
 }
 
 module.exports.gatherUserAppliableServers = async (user) => {//USER as in user record. Is nullable
@@ -111,19 +138,9 @@ module.exports.gatherUserAppliableServers = async (user) => {//USER as in user r
         ...openApplications.map(a => a.serverID)
     ];
 
-    const [unhiddenServers, hiddenServers] = await Promise.all([
-        Server.findAll({ where: { hidden: false } }),
-        Server.findAll({
-            where: { hidden: true },
-            include: [{
-                model: Rank,
-                where: { id: userRankIds },
-                through: { attributes: [] }
-            }]
-        })
-    ]);
+    const foundServers = await rankViewableServers(userRankIds);
 
-    const allViewable = [...unhiddenServers, ...hiddenServers]
+    const allViewable = foundServers
         .filter(server => !appliedServerIds.includes(server.id));
 
     return allViewable;
