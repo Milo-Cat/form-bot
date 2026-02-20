@@ -57,6 +57,7 @@ auto-incremented integer attribute
 called id as primary key
 if none is specified.
 */
+//region User
 const User = sequelize.define(
     'User',
     {
@@ -109,6 +110,7 @@ const User = sequelize.define(
     },
 );
 
+//region WhitelistApplication
 const WhitelistApplication = sequelize.define(
     'WhitelistApplication',
     {
@@ -160,6 +162,7 @@ const WhitelistApplication = sequelize.define(
     },
 );
 
+//region Server
 const Server = sequelize.define(
     'Server',
     {
@@ -219,6 +222,7 @@ const Server = sequelize.define(
     },
 );
 
+//region Rank
 const Rank = sequelize.define(
     'Rank',
     {
@@ -237,6 +241,7 @@ const Rank = sequelize.define(
     },
 );
 
+//region Infraction
 const Infraction = sequelize.define(
     'Infraction',
     {
@@ -260,6 +265,7 @@ const Infraction = sequelize.define(
     },
 );
 
+//region Punishment
 const Punishment = sequelize.define(
     'Punishment',
     {
@@ -296,6 +302,7 @@ const Punishment = sequelize.define(
     },
 );
 
+//region StaffMember
 const StaffMember = sequelize.define(
     'StaffMember',
     {
@@ -321,6 +328,7 @@ const StaffMember = sequelize.define(
     },
 );
 
+//region ServerPlayerWhitelist
 const ServerPlayerWhitelist = sequelize.define(
   'ServerPlayerWhitelist',
   {
