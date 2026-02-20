@@ -1,22 +1,22 @@
 const { Op } = require('sequelize');
-const {User, Server, WhitelistApplication, Infraction, Punishment, StaffMember} = require('../schema.js');
+const { User, Server, WhitelistApplication, Infraction, Punishment, StaffMember } = require('../schema.js');
 
 
 module.exports.findServer = async (serverName) => {
 
     return await Server.findOne({
-        where: { name: serverName } 
+        where: { name: serverName }
     });
 }
 
 module.exports.modifyServer = async (old_name, name, title, description, panelID, ipAddress, modpackURL, modpackVersion, modLoader, minecraftVersion, whitelistRequired, hidden) => {
 
-    if(!title || title.length == 0){
+    if (!title || title.length == 0) {
         title = name;
     }
 
     let server;
-    if(old_name) {
+    if (old_name) {
         server = await this.findServer(old_name);
     }
 
@@ -51,7 +51,7 @@ module.exports.modifyServer = async (old_name, name, title, description, panelID
         console.log(`Created server ${name}`);
     }
     await server.save();
-    
+
     await this.cacheServers();//update cache after modification
 
     return server;
@@ -60,25 +60,71 @@ module.exports.modifyServer = async (old_name, name, title, description, panelID
 const serverCache = [];
 
 module.exports.cacheServers = async () => {//to be ran at startup or when a server is added/modified
-    
+
     serverCache.length = 0;//clear cache
 
     const servers = await Server.findAll();
-    
+
     serverCache.push(...servers.map(s => s.name));
-    
+
     return serverCache;
 }
 
-module.exports.getCachedServers = () => {return serverCache;}
+module.exports.getCachedServers = () => { return serverCache; }
 
 
 module.exports.isServerHiddenToUser = async (server, user) => {
 
-    if(!server.hidden) return false;
+    if (!server.hidden) return false;
 
     const hiddenServers = user.hiddenServers;
     if (!hiddenServers || !Array.isArray(hiddenServers)) return false;
 
     return hiddenServers.includes(server.name);
+}
+
+module.exports.gatherUnhiddenServers = async () => {
+    return await Server.findAll({ where: { hidden: false } });
+}
+
+module.exports.gatherViewableServers = async (user) => {//USER as in user record. Is nullable
+
+    if(!user){
+        return await this.gatherUnhiddenServers();
+    }
+
+    const [userRanks, whitelistedServers, openApplications] = await Promise.all([
+        user.getRanks(),
+        user.getServers(),
+        WhitelistApplication.findAll({
+            where: { 
+                status: 'pending',
+                userID: user.discordID
+            }
+        })
+    ]);
+
+    const userRankIds = userRanks.map(r => r.id);
+
+    const appliedServerIds = [
+        ...whitelistedServers.map(s => s.id),
+        ...openApplications.map(a => a.serverID)
+    ];
+
+    const [unhiddenServers, hiddenServers] = await Promise.all([
+        Server.findAll({ where: { hidden: false } }),
+        Server.findAll({
+            where: { hidden: true },
+            include: [{
+                model: Rank,
+                where: { id: userRankIds },
+                through: { attributes: [] }
+            }]
+        })
+    ]);
+
+    const allViewable = [...unhiddenServers, ...hiddenServers]
+        .filter(server => !appliedServerIds.includes(server.id));
+
+    return allViewable;
 }
