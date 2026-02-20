@@ -1,0 +1,10 @@
+module.exports = {
+    FARWATER_SEAL: "<:farwaterseal:954280578860081183>",
+    FABRIC: "<:fabric:1348306590998204436> ",
+    FORGE: "<:forge:1348306592629788754>",
+    NEOFORGE: "<:neoforged:1404088666120257737>",
+    HYTALE: "<:hytale:1460609588083556458>",
+    MODRINTH: "<:modrinth:1348306596115255430>",
+    CURSEFORGE: "<:curseforge:1348306594491924580>",
+
+}
