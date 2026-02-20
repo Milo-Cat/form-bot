@@ -62,8 +62,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (commandResponse.success) return;
 
-    console.error(`Command/Interaction failure: ${commandResponse.message}`);
-    console.error(commandResponse);
+    if(commandResponse.message){
+        console.error(`Command/Interaction failure: ${commandResponse.message}`);
+        console.error(commandResponse);
+    }
 
 });
 
