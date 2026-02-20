@@ -58,7 +58,7 @@ interactions.set(OPEN_FORM_ID,
 		if(USER_MANAGER.isStaff(interaction.user.id)){
 			servers = SERVER_MANAGER.gatherAppliableServersForStaff(user);
 		} else {
-			servers = SERVER_MANAGER.gatherViewableServers(user);
+			servers = SERVER_MANAGER.gatherUserAppliableServers(user);
 		}
 
 		if(servers.length === 0){

@@ -87,7 +87,7 @@ module.exports.gatherUnhiddenServers = async () => {
     return await Server.findAll({ where: { hidden: false } });
 }
 
-module.exports.gatherViewableServers = async (user) => {//USER as in user record. Is nullable
+module.exports.gatherUserAppliableServers = async (user) => {//USER as in user record. Is nullable
 
     if (!user) {
         return await this.gatherUnhiddenServers();
