@@ -80,7 +80,7 @@ class TextField extends Field {
     getType() { return 'text' }
 }
 
-class LargeTextField extends Field {
+class LargeTextField extends TextField {
     inputStyle(){return TextInputStyle.Paragraph;}
 }
 
