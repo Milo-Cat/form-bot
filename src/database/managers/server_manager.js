@@ -89,7 +89,7 @@ module.exports.gatherUnhiddenServers = async () => {
 
 module.exports.gatherViewableServers = async (user) => {//USER as in user record. Is nullable
 
-    if(!user){
+    if (!user) {
         return await this.gatherUnhiddenServers();
     }
 
@@ -97,7 +97,7 @@ module.exports.gatherViewableServers = async (user) => {//USER as in user record
         user.getRanks(),
         user.getServers(),
         WhitelistApplication.findAll({
-            where: { 
+            where: {
                 status: 'pending',
                 userID: user.discordID
             }
@@ -127,4 +127,25 @@ module.exports.gatherViewableServers = async (user) => {//USER as in user record
         .filter(server => !appliedServerIds.includes(server.id));
 
     return allViewable;
+}
+
+module.exports.gatherAppliableServersForStaff = async (user) => {
+    const [whitelistedServers, openApplications, servers] = await Promise.all([
+        user.getServers(),
+        WhitelistApplication.findAll({
+            where: {
+                status: 'pending',
+                userID: user.discordID
+            }
+        }),
+        Server.findAll()
+    ]);
+
+    const appliedServerIds = [
+        ...whitelistedServers.map(s => s.id),
+        ...openApplications.map(a => a.serverID)
+    ];
+
+    return servers.filter(server => !appliedServerIds.includes(server.id));
+
 }
