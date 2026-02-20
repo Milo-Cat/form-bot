@@ -11,7 +11,7 @@ const { FABRIC, FORGE, NEOFORGE, MODRINTH, CURSEFORGE } = require('../emojis.js'
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('list-servers')
+        .setName('list-my-servers')
         .setDescription('Lists out the servers you can view and apply to'),
         
     async execute(interaction) {
@@ -61,7 +61,8 @@ async function getServers(interaction) {
 
 function buildEmbed(server) {
 
-    const text = [
+    const text = [,
+        server.name,
         server.description,
         "",
         `Minecraft Version: ${server.modpackVersion} ${formatLoader(server.modLoader)}`,
@@ -91,15 +92,11 @@ function formatLoader(loader) {
 }
 
 function formatLink(packLink) {
-    switch (true) {
-        case input.startsWith("https://modrinth.com"):
-            return `${MODRINTH} [Modrinth](<${packLink}>)`;
-
-        case input.startsWith("https://www.curseforge.com/"):
-            return `${CURSEFORGE} [Curseforge](<${packLink}>)`;
-
-        default:
-            return `[Link](<${packLink}>)`;
+    if (packLink.startsWith("https://modrinth.com")) {
+        return `${MODRINTH} [Modrinth](<${packLink}>)`;
+    } else if (packLink.startsWith("https://www.curseforge.com/")) {
+        return `${CURSEFORGE} [Curseforge](<${packLink}>)`;
+    } else {
+        return `[Link](<${packLink}>)`;
     }
-
 }
