@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const {
     SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder,
     ButtonBuilder, ButtonStyle, ButtonInteraction, ModalBuilder,
