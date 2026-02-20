@@ -237,35 +237,6 @@ const Rank = sequelize.define(
     },
 );
 
-const ServerViewableToRank = sequelize.define(
-    'ServerViewOverride',
-    {
-        rank: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-            references: {
-                model: Rank,
-                key: 'id',
-            },
-        },
-        serverID: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-            references: {
-                model: Server,
-                key: 'id',
-            },
-        },
-        
-    },
-    {
-        timestamps: false,
-        freezeTableName: true,
-    },
-);
-
 const Infraction = sequelize.define(
     'Infraction',
     {
@@ -415,11 +386,8 @@ StaffMember.hasMany(Infraction, {foreignKey: 'staffIssuerID', as: 'IssuedInfract
 StaffMember.belongsTo(User, {foreignKey: 'userID'});
 User.hasOne(StaffMember, {foreignKey: 'userID'});
 
-ServerViewableToRank.belongsTo(Server, {foreignKey: 'serverID'});
-Server.hasMany(ServerViewableToRank, {foreignKey: 'serverID'});
-
-ServerViewableToRank.belongsTo(Rank, {foreignKey: 'rank'});
-Rank.hasMany(ServerViewableToRank, {foreignKey: 'rank'});
+Server.belongsToMany(Rank, {through: 'ServerViewableToRank'});
+Rank.belongsToMany(Server, {through: 'ServerViewableToRank'});
 
 User.belongsToMany(Rank, {through: 'UserRanks'});
 Rank.belongsToMany(User, {through: 'UserRanks'});
