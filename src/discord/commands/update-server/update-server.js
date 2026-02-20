@@ -142,7 +142,7 @@ class FieldState {
 //region command
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('open-editor')
+        .setName('edit-server')
         .setDescription('Edit an existing server entry or create a new one.')
         .addStringOption(option =>
             option.setName('server_name')
