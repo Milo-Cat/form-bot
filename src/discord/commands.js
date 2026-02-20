@@ -19,7 +19,6 @@ const command_names = [
     "who-is",
     "account-lookup",
     "promote",
-    "update-server",
     "force-register",
     "update-server/update-server",
     "list-servers"
