@@ -4,6 +4,9 @@ const {
 	TextInputBuilder, LabelBuilder, TextDisplayBuilder, StringSelectMenuOptionBuilder,
 	TextInputStyle, MessageFlags, EmbedBuilder
 } = require('discord.js');
+const {
+	SERVER_MANAGER,
+} = require('../../cmnd_resources.js').DATABASE;
 
 const WHITELIST_SUBMIT_ID_FULL = 'whitelist-submit-full';
 const WHITELIST_SUBMIT_ID = 'whitelist-submit';
@@ -37,37 +40,45 @@ const text = new TextDisplayBuilder().setContent(
 	'Text that could not fit in to a label or description\n-# Markdown can also be used',
 );
 
+function buildServerSelectOptionsLabel(servers) {
+	const options = [];
 
-function buildFullApplication() {
+	for (const server of servers) {
+		options.push(
+			new StringSelectMenuOptionBuilder()
+				.setLabel(server.title)
+				.setDescription(server.description || "...")
+				.setValue(server.name)
+		);
+	}
 
 	const serverSelect = new StringSelectMenuBuilder()
-	.setCustomId('server')
-	.setPlaceholder('Select the server you want to join')
-	.setRequired(true)
-	.addOptions(
-		new StringSelectMenuOptionBuilder()
-			.setLabel('Basics')
-			.setDescription('Nice N simple')
-			.setValue('basics'),
-		new StringSelectMenuOptionBuilder()
-			.setLabel('S11')
-			.setDescription('Perpetually in development')
-			.setValue('s11')
-	);
+		.setCustomId('server')
+		.setPlaceholder('Select the server you want to join')
+		.setRequired(true)
+		.addOptions(
+			...options
+		);
 	
-	const serverSelectLabel = new LabelBuilder()
-	.setLabel("Which server do you want to join?")
-	.setStringSelectMenuComponent(serverSelect);
+	return new LabelBuilder()
+		.setLabel("Which server do you want to join?")
+		.setStringSelectMenuComponent(serverSelect);
+}
+function buildFullApplication(user, servers) {
+
+	const serverSelectLabel = buildServerSelectOptionsLabel(servers);
 
 	const fullApplication = new ModalBuilder().setCustomId(WHITELIST_SUBMIT_ID_FULL).setTitle('Apply!');
 
 	fullApplication.addLabelComponents(ingameNameLabel, serverSelectLabel, ageLabel)
-	.addTextDisplayComponents(text);
+		.addTextDisplayComponents(text);
 	return fullApplication;
 }
 
 
-function buildBasicApplication(user) {
+function buildBasicApplication(user, servers) {
+
+	const serverSelectLabel = buildServerSelectOptionsLabel(servers);
 
 	const userInfo = new TextDisplayBuilder().setContent(
 
@@ -90,21 +101,21 @@ ${user.age}`
 
 const rejectModal = new ModalBuilder().setCustomId(REJECT_REASON_ID).setTitle('Reject Reason');
 rejectModal.addLabelComponents(
-    new LabelBuilder()
-        .setLabel('Reason for rejection (optional)')
-        .setDescription('This reason will be shown to the applicant and logged for staff reference.')
-        .setTextInputComponent(
-            new TextInputBuilder()
-                .setCustomId('reason')
-                .setStyle(TextInputStyle.Paragraph)
-                .setRequired(false)
-        )
+	new LabelBuilder()
+		.setLabel('Reason for rejection (optional)')
+		.setDescription('This reason will be shown to the applicant and logged for staff reference.')
+		.setTextInputComponent(
+			new TextInputBuilder()
+				.setCustomId('reason')
+				.setStyle(TextInputStyle.Paragraph)
+				.setRequired(false)
+		)
 );
 
 module.exports = {
-    fullApplication: buildFullApplication,
-    buildBasicApplication: buildBasicApplication,
-    rejectModal: rejectModal,
+	buildFullApplication: buildFullApplication,
+	buildBasicApplication: buildBasicApplication,
+	rejectModal: rejectModal,
 	WHITELIST_SUBMIT_ID_FULL,
 	WHITELIST_SUBMIT_ID,
 }
