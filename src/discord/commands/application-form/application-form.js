@@ -106,7 +106,7 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 		if (age === null || isNaN(age)) {
 			return await interaction.followUp({
 				content: `Invalid Age. <${ageInput}> \nPlease Resubmit Form with a valid age.`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 		if (age < 13) {
