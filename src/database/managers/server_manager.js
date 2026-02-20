@@ -170,3 +170,7 @@ module.exports.gatherAppliableServersForStaff = async (user) => {
     return servers.filter(server => !appliedServerIds.includes(server.id));
 
 }
+
+module.exports.allServers = async () => {
+    return await Server.findAll();
+}
