@@ -114,7 +114,7 @@ async function fieldEditSubmit(interaction, field) {
     if (field.id === 'server_name') {
         input = cleanInput(input).toLowerCase();
     }
-    if (input.length == 0) return await interaction.reply({ content: "Given input invalid!", flags: MessageFlags.Ephemeral });
+    if (input.length === 0) return await interaction.reply({ content: "Given input invalid!", flags: MessageFlags.Ephemeral });
     fieldState.value = input;
 
 
