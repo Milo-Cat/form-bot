@@ -58,7 +58,7 @@ class TextField extends Field {
             .setTextInputComponent(
                 new TextInputBuilder()
                     .setCustomId('value')
-                    .setStyle(TextInputStyle.Short)
+                    .setStyle(this.inputStyle())
                     .setRequired(true)
                     .setValue(value)
             );
@@ -71,12 +71,19 @@ class TextField extends Field {
         return modal;
     }
 
+    inputStyle(){return TextInputStyle.Short;}
+
     valueGetter(interaction) {
         interaction.fields.getTextInputValue('value');
     }
 
     getType() { return 'text' }
 }
+
+class LargeTextField extends Field {
+    inputStyle(){return TextInputStyle.Paragraph;}
+}
+
 class BoolField extends Field {
     constructor(...args) {
         super(...args);
@@ -95,7 +102,7 @@ class BoolField extends Field {
 new TextField('server_name', 'name', 'Server Name (Internal)', 'The name of the server.', '', 'Edit Internal Name');
 new TextField('server_title', 'title', 'Server Title', 'The full title of the server.', '', 'Edit Title');
 new TextField('server_ip', 'ipAddress', 'Server IP', 'The IP address of the server.', '.farwater.de', 'Edit IP');
-new TextField('server_description', 'description', 'Server Description', 'Do I need to describe descriptions?', 'A Farwater Server', 'Edit Description');
+new LargeTextField('server_description', 'description', 'Server Description', 'Do I need to describe descriptions?', 'A Farwater Server', 'Edit Description');
 new TextField('modpack_version', 'modpackVersion', 'Modpack Version', 'The version of the modpack.', '1.0.0', 'Edit Pack Version');
 
 new TextField('modpack_url', 'modpackURL', 'Modpack URL', 'The URL of the modpack.', 'https://modrinth.com/modpack/', 'Edit Pack Link');
