@@ -22,8 +22,8 @@ class Panel {
 
 const activePanels = [];
 module.exports.initialiseEditor = (serverName, userID, server, fieldStates) => {
-    console.log("\x1b[31mInitialising a Panel\x1b[0m");
     const panel = new Panel(serverName, userID, server, fieldStates);
+    console.log(`\x1b[31mInitialising a Server Edit Panel\x1b[0m \nAuthentication key: \x1b[33m${panel.authKey}\x1b[0m`);
     activePanels.push(panel);
     return panel;
 }
