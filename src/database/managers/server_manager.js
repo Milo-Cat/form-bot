@@ -83,10 +83,14 @@ module.exports.isServerHiddenToUser = async (server, user) => {
     return hiddenServers.includes(server.name);
 }
 
+module.exports.gatherUnhiddenServers = async () => {
+    return await Server.findAll({ where: { hidden: false } });
+}
+
 module.exports.gatherViewableServers = async (user) => {//USER as in user record. Is nullable
 
     if(!user){
-        return await Server.findAll({ where: { hidden: false } });
+        return await this.gatherUnhiddenServers();
     }
 
     const userRanks = await user.getRanks();
