@@ -218,13 +218,14 @@ module.exports = {
 
 //region submit and cancel
 
-const EDIT_SUBMIT = "server_edit_submit";
+const EDIT_AUTH = "server_edit_auth";
+const EDIT_SUBMIT = "server_edit_submit_all";
 const EDIT_CANCEL = "server_edit_cancel";
 
 const submitActionRow = new ActionRowBuilder();
 submitActionRow.addComponents(
     new ButtonBuilder()
-        .setCustomId(EDIT_SUBMIT)
+        .setCustomId(EDIT_AUTH)
         .setLabel("Submit Changes")
         .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
@@ -233,13 +234,53 @@ submitActionRow.addComponents(
         .setStyle(ButtonStyle.Danger)
 )
 
-interactions.set(EDIT_SUBMIT,
+
+
+const AuthModal = new ModalBuilder()
+    .setCustomId(EDIT_SUBMIT)
+    .setTitle("Enter Auth Key");
+
+AuthModal.addLabelComponents(
+    new LabelBuilder()
+        .setLabel("Auth Key")
+        .setDescription("Key can be found in the panel log")
+        .setTextInputComponent(
+            new TextInputBuilder()
+                .setCustomId('value')
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+        )
+);
+
+interactions.set(EDIT_AUTH,
     async (interaction) => {
         cleanPanels();
         if (!interaction.isButton()) return console.log("Not a button!");
+        const panel = findPanel(interaction.user.id);
+        if (!panel) return await interaction.reply(noPanelMsg);
+        return await interaction.showModal(
+            AuthModal
+        );
+    }
+)
+
+interactions.set(EDIT_SUBMIT,
+    async (interaction) => {
+        cleanPanels();
+
+        if (!interaction.isModalSubmit()) {
+            console.error("Interaction is not a modal submit!");
+            return;
+        };
 
         const panel = findPanel(interaction.user.id);
         if (!panel) return await interaction.reply(noPanelMsg);
+
+        let input = interaction.fields.getTextInputValue('value');
+
+        if(panel.authKey !== input){
+            return await interaction.reply({ content: "Invalid Auth Key!", flags: MessageFlags.Ephemeral })
+        }
 
         const name = panel.getFieldState('server_name').value;
         const title = panel.getFieldState('server_title').value;
@@ -263,11 +304,12 @@ interactions.set(EDIT_SUBMIT,
         );
 
 
-        await interaction.message.edit({
+        await panel.message.edit({
             content: `Editor Closed - Changes Saved`,
-            embeds: interaction.message.embeds,
+            embeds: panel.message.embeds,
             components: []
         });
+        await interaction.deferUpdate();
 
         removePanel(panel);
     }
