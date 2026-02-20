@@ -5,7 +5,7 @@ const {
 require('dotenv').config();
 const { cleanInput, cleanIntegerInput } = require('../../../utility/input_cleaners.js');
 const {
-	fullApplication, buildBasicApplication, rejectModal,
+	buildFullApplication, buildBasicApplication, rejectModal,
 	WHITELIST_SUBMIT_ID_FULL, WHITELIST_SUBMIT_ID, REJECT_REASON_ID
 } = require('./modal-builders.js');
 
@@ -53,13 +53,30 @@ interactions.set(OPEN_FORM_ID,
 
 		const user = await USER_MANAGER.find(interaction.user.id);
 
-		if (!user) {
-			return await interaction.showModal(fullApplication);
+		let servers;
+
+		if(USER_MANAGER.isStaff(interaction.user.id)){
+			servers = SERVER_MANAGER.gatherAppliableServersForStaff(user);
+		} else {
+			servers = SERVER_MANAGER.gatherViewableServers(user);
 		}
 
-		const applic = buildBasicApplication(user);
+		if(servers.length === 0){
+			//No servers
+			return await interaction.reply({
+				content: "There are no Servers left for you to apply to!",
+				flags: MessageFlags.Ephemeral
+			});
+		}
 
-		return await interaction.showModal(applic);
+		let form;
+		if (!user) {
+			form = buildFullApplication(user, servers);
+		} else {
+			form = buildBasicApplication(user, servers);
+		}
+
+		return await interaction.showModal(form);
 	}
 );
 
