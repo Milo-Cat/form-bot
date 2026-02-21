@@ -369,6 +369,13 @@ const ServerPlayerWhitelist = sequelize.define(
 User.belongsToMany(Server, {through: ServerPlayerWhitelist});
 Server.belongsToMany(User, {through: ServerPlayerWhitelist});
 
+ServerPlayerWhitelist.belongsTo(User, { foreignKey: 'UserId' });
+ServerPlayerWhitelist.belongsTo(Server, { foreignKey: 'ServerId' });
+
+User.hasMany(ServerPlayerWhitelist, { foreignKey: 'UserId' });
+Server.hasMany(ServerPlayerWhitelist, { foreignKey: 'ServerId' });
+
+
 WhitelistApplication.belongsTo(User, {foreignKey: 'userID', as: 'Applicant'});
 User.hasMany(WhitelistApplication, {foreignKey: 'userID', as: 'Applications'});
 
