@@ -347,7 +347,7 @@ function buildEmbed(newServer, serverName, fieldStates) {
 
     try {
         return new EmbedBuilder()
-            .setColor('#1539da')
+            .setColor('#03cffe')
             .setTitle(title)
             .addFields(
                 ...embedFields
