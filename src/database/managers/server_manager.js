@@ -9,6 +9,13 @@ module.exports.findServer = async (serverName) => {
     });
 }
 
+module.exports.findServerByID = async (serverID) => {
+
+    return await Server.findOne({
+        where: { id: serverID }
+    });
+}
+
 module.exports.modifyServer = async (old_name, name, title, description, panelID, ipAddress, modpackURL, modpackVersion, modLoader, minecraftVersion, whitelistRequired, hidden) => {
 
     if (!title || title.length == 0) {
