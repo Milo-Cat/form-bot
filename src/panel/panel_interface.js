@@ -10,10 +10,10 @@ module.exports.sendCommand = async (serverId, command) => {
         const response = await client.servers.sendCommand(serverId, command);
         console.log(`Command sent to ${serverId}:`, command);
         console.log("Panel response:", response);
-        return response;
+        return true;
     } catch (err) {
         console.error("Failed to send command:", err);
-        return null;
+        return false;
     }
 }
 
