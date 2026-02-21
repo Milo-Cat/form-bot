@@ -88,6 +88,8 @@ const embed = new EmbedBuilder()
                 Shows a list of all the servers you have access to.
                 Ranks sometimes give early access to our servers,
                 this command lets you view all the servers you can apply to.
+                You can also use this command to check the status of your
+                server applications. Red means rejected, Green means approved.
                 Note: the command response is only visible to you.
                 ` },
         )
