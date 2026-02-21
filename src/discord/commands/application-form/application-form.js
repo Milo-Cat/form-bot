@@ -389,7 +389,16 @@ interactions.set(WHITELIST_SUBMIT_ID,
 module.exports.widgets = interactions;
 
 
+async function sendUserMessage(application, interaction, message) {
+	const discordRec = await USER_MANAGER.findById(application.userID);
 
+	const serverRec = await SERVER_MANAGER.findServerByID(application.serverID);
+
+	const discordUser = await interaction.client.users.fetch(discordRec.discordID);
+
+	await discordUser.send(`Your whitelist application to ${serverRec.title} has been ${message}`);
+
+}
 
 argumentedInteractions.set(ACCEPT_ID,
 	async (interaction, id) => {
@@ -448,6 +457,8 @@ argumentedInteractions.set(ACCEPT_ID,
 			//SUCCESS
 			const msg = await interaction.reply({ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
 			await msg.delete();
+
+			await sendUserMessage(application, interaction, "approved!");
 			return;
 		};
 
@@ -511,7 +522,12 @@ argumentedInteractions.set(REJECT_REASON_ID,
 		}
 
 
-		const reason = interaction.fields.getTextInputValue('reason');
+		let reason = interaction.fields.getTextInputValue('reason');
+
+		if(!reason || reason.length === 0){
+			reason = "No reason provided";
+		}
+
 		const application = await APPLICATION_MANAGER.update(cleanID, true, reason, admin.id);
 
 		if (!application) return;
@@ -525,7 +541,7 @@ argumentedInteractions.set(REJECT_REASON_ID,
 			.setFields(
 				...oldEmbed.fields,
 				{ name: 'Reviewed By', value: `<@${reviewerId}>` },
-				{ name: 'Rejection Reason', value: reason || "No reason provided" }
+				{ name: 'Rejection Reason', value: reason }
 			);
 
 		await message.edit({
@@ -538,6 +554,10 @@ argumentedInteractions.set(REJECT_REASON_ID,
 		});
 
 		await statusResponse.delete();
+		
+
+		await sendUserMessage(application, interaction, `rejected!\nReason: ${reason}`);
+
 	}
 );
 
