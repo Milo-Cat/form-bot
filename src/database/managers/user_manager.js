@@ -4,6 +4,8 @@ const { all } = require('sequelize/lib/operators');
 
 function appendAge(record) {
 
+    if(!record) return record;
+
     const ageDate = new Date(
         Date.now() - Date.parse(record.birthdate)
     );
