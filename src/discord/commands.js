@@ -22,7 +22,9 @@ const command_names = [
     "force-register",
     "update-server/update-server",
     "list-my-servers",
-    "list-public-servers"
+    "list-public-servers",
+    "bot-explanation",
+    "push-whitelists"
 ];
 
 
