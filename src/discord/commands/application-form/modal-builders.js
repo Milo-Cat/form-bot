@@ -118,4 +118,5 @@ module.exports = {
 	rejectModal: rejectModal,
 	WHITELIST_SUBMIT_ID_FULL,
 	WHITELIST_SUBMIT_ID,
+	REJECT_REASON_ID
 }
