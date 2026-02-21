@@ -21,7 +21,8 @@ const command_names = [
     "promote",
     "force-register",
     "update-server/update-server",
-    "list-servers"
+    "list-my-servers",
+    "list-public-servers"
 ];
 
 

@@ -1,5 +1,5 @@
 const {
-    SlashCommandBuilder, EmbedBuilder
+    SlashCommandBuilder, EmbedBuilder, MessageFlags
 } = require('discord.js');
 const UTILITY = require('../cmnd_resources.js');
 const { USER_MANAGER,
@@ -16,12 +16,21 @@ module.exports = {
         
     async execute(interaction) {
 
+        const showInternalName = USER_MANAGER.isStaff(interaction.user.id);
+
         const [_, servers] = await Promise.all([
             interaction.deferReply({
-                content: "Fetching servers..."
+                content: "Fetching servers...",
+                flags: MessageFlags.Ephemeral
             }),
             getServers(interaction)
         ]);
+
+        return await this.handleListServersCommand(servers, interaction, showInternalName);
+    }
+};
+
+module.exports.handleListServersCommand = async (servers, interaction, showInternalName) => {
 
         if (servers.length === 0) {
             return await interaction.editReply({
@@ -33,7 +42,7 @@ module.exports = {
 
         for(const server of servers){
             embeds.push(
-                buildEmbed(server)
+                buildEmbed(server, showInternalName)
             );
         }
 
@@ -42,7 +51,6 @@ module.exports = {
                 embeds: embeds
 		});
     }
-};
 
 async function getServers(interaction) {
     const user = await USER_MANAGER.find(interaction.user.id);
@@ -59,25 +67,61 @@ async function getServers(interaction) {
 }
 
 
-function buildEmbed(server) {
+function buildEmbed(server, showInternalName) {
+    
+    const embedFields = [
+        {
+        name: "Description",
+        value: server.description
+        },
+        {
+        name: "Minecraft Version",
+        value: `${formatLoader(server.modLoader)} ${server.minecraftVersion}`
+        },
+        {
+        name: "IP",
+        value: `\`${server.ipAddress}\``
+        },
+        {
+        name: "Modpack Link",
+        value: `${formatLink(server.modpackURL)}  V${server.modpackVersion}`
+        }
+    ]
 
-    const text = [,
-        server.name,
-        server.description,
+
+
+    let text = "";
+
+    if(showInternalName){
+        text += server.name;
+    }
+    if(server.hidden){
+        text += "\nNOT PUBLICALLY AVAILABLE!";
+    }
+
+    /*const text = [,
+        showInternalName && server.name,
+        `\`\`\`\n${server.description}\n\`\`\``,
         "",
         `Minecraft Version: ${server.modpackVersion} ${formatLoader(server.modLoader)}`,
         `IP: \`${server.ipAddress}\``,
         `Modpack Link: ${formatLink(server.modpackURL)}  V${server.modpackVersion}`,
         //server.whitelistRequired ? "```diff\n+ Whitelist not required\n```" : "```diff\n- Whitelist required\n```"
-    ];
+    ].filter(Boolean);
     if (server.hidden) {
         text.push("NOT PUBLICALLY AVAILABLE!")
-    }
+    }*/
 
-    return new EmbedBuilder()
+    const embed = new EmbedBuilder()
         .setColor('#1539da')
         .setTitle(server.title)
-        .setDescription(text.join("\n"));
+        .addFields(...embedFields);
+    
+    if(text.length > 0){
+        embed.setDescription(text);
+    }
+
+    return embed;
 }
 
 function formatLoader(loader) {
