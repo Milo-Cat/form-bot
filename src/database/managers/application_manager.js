@@ -45,3 +45,18 @@ module.exports.update = async (id, reject, reason, admin) => {
 
     return application;
 }
+
+module.exports.getStatus = async (user, server) => {
+
+    const application = await WhitelistApplication.findOne({
+        where: {
+            userID: user.id,
+            serverID: server.id
+        },
+        order: [['id', 'DESC']]
+    });
+
+    if(!application) return "NaN";
+
+    return application.status;
+}
