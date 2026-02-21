@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { User, Server, WhitelistApplication, Infraction, Punishment, StaffMember } = require('../schema.js');
+const { User, Server, WhitelistApplication, Infraction, Punishment, StaffMember, Rank, ServerPlayerWhitelist } = require('../schema.js');
 
 
 module.exports.findServer = async (serverName) => {
@@ -75,12 +75,14 @@ module.exports.getCachedServers = () => { return serverCache; }
 
 module.exports.isServerHiddenToUser = async (server, user) => {
 
-    if (!server.hidden) return false;
+    if (server.hidden){
 
     const hiddenServers = user.hiddenServers;
     if (!hiddenServers || !Array.isArray(hiddenServers)) return false;
 
     return hiddenServers.includes(server.name);
+    }
+    return false;
 }
 
 module.exports.gatherUnhiddenServers = async () => {
@@ -119,7 +121,6 @@ async function rankViewableServers(userRankIds) {
 }
 
 module.exports.gatherUserAppliableServers = async (user) => {//USER as in user record. Is nullable
-
     if (!user) {
         return await this.gatherUnhiddenServers();
     }
@@ -129,8 +130,8 @@ module.exports.gatherUserAppliableServers = async (user) => {//USER as in user r
         user.getServers(),
         WhitelistApplication.findAll({
             where: {
-                status: 'pending',
-                userID: user.discordID
+                status: { [Op.in]: ['pending', 'approved'] },
+                userID: user.id
             }
         })
     ]);
@@ -155,8 +156,8 @@ module.exports.gatherAppliableServersForStaff = async (user) => {
         user.getServers(),
         WhitelistApplication.findAll({
             where: {
-                status: 'pending',
-                userID: user.discordID
+                status: { [Op.in]: ['pending', 'approved'] },
+                userID: user.id
             }
         }),
         Server.findAll()
@@ -173,4 +174,57 @@ module.exports.gatherAppliableServersForStaff = async (user) => {
 
 module.exports.allServers = async () => {
     return await Server.findAll();
+}
+
+
+const { sendCommand } = require("../../panel/panel_interface.js");
+
+module.exports.attemptWhitelist = async () => {
+
+    const updates = [];
+    const errors = [];
+
+    const servers = await Server.findAll();
+
+    for(const server of servers){
+
+        const panelId = server.panelID;
+
+        let success = await sendCommand(panelId, "x");
+
+        if(!success){
+            errors.push(`Failed to contact server ${server.name}`);
+            continue;
+        }
+
+        const whitelists = await ServerPlayerWhitelist.findAll({
+            where: {
+                ServerId: server.id,
+                implemented: false
+            },
+            include: [{
+                    model: User,
+                    attributes: ['mcName']
+            }]
+        });
+        
+        for(const entry of whitelists){
+            const name = entry.User.mcName
+            success = await sendCommand(panelId, `whitelist add ${name}`)
+            if(success){
+                updates.push(`Whitelisted ${name} on ${server.name}`);
+                entry.implemented = true;
+                await entry.save();
+            } else {
+                errors.push(`Failed to send whitelist command to ${server.name}`);
+                break;
+            }
+        }
+
+        updates.push(`${server.name} is up to date`)
+
+    }
+
+    const response = [...errors, "" , ...updates].join("\n");
+    return response;
 }
