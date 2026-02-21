@@ -1,0 +1,12 @@
+
+
+
+
+## Required .env variables
+
+TOKEN = \
+APPLICATION_ID = \
+SERVER_ID = \
+CHANNEL_ID = \
+SUBMISSIONS_CHANNEL_ID = \
+PANEL_API_KEY = 
