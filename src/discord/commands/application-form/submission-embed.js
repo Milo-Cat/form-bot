@@ -3,12 +3,12 @@ const {
 } = require('discord.js');
 
 
-module.exports.buildSubmission = (server, serverId, discord, game_name, age, game_uuid) => {
+module.exports.buildSubmission = (server, discord, game_name, age, game_uuid) => {
     return new EmbedBuilder()
         .setColor('#1539da')
         .setTitle('Whitelist Application')
         .addFields(
-            { name: 'Server', value: `${serverId}:${server}` },
+            { name: 'Server', value: `${server.title}\n${server.name}` },
             { name: 'Discord', value: `<@!${discord}>` },
             { name: 'Ingame Name', value: `${game_name}` },
             { name: 'Age', value: `${age}` },
