@@ -99,19 +99,6 @@ function buildEmbed(server, showInternalName) {
         text += "\nNOT PUBLICALLY AVAILABLE!";
     }
 
-    /*const text = [,
-        showInternalName && server.name,
-        `\`\`\`\n${server.description}\n\`\`\``,
-        "",
-        `Minecraft Version: ${server.modpackVersion} ${formatLoader(server.modLoader)}`,
-        `IP: \`${server.ipAddress}\``,
-        `Modpack Link: ${formatLink(server.modpackURL)}  V${server.modpackVersion}`,
-        //server.whitelistRequired ? "```diff\n+ Whitelist not required\n```" : "```diff\n- Whitelist required\n```"
-    ].filter(Boolean);
-    if (server.hidden) {
-        text.push("NOT PUBLICALLY AVAILABLE!")
-    }*/
-
     const embed = new EmbedBuilder()
         .setColor('#1539da')
         .setTitle(server.title)
