@@ -1,6 +1,7 @@
 const {
 	SlashCommandBuilder, ActionRowBuilder,
-	ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder
+	ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder,
+	UserManager
 } = require('discord.js');
 require('dotenv').config();
 const { cleanInput, cleanIntegerInput } = require('../../../utility/input_cleaners.js');
@@ -28,55 +29,46 @@ const REJECT_ID = 'whitelist-reject';
 
 
 module.exports = {
-	data: new SlashCommandBuilder().setName('whitelist-apply').setDescription('Open an application apply message'),
+	data: new SlashCommandBuilder().setName('whitelist-apply').setDescription('Opens a server application form'),
 	async execute(interaction) {
 
-		await interaction.reply({
-			content: "Form opened... If you do not see the form, please try again.",
-			flags: MessageFlags.Ephemeral,
-			components: [
-				new ActionRowBuilder().addComponents(
-					new ButtonBuilder()
-						.setCustomId(OPEN_FORM_ID)
-						.setLabel('PRESS ME')
-						.setStyle(ButtonStyle.Primary)
-				)
-			]
-		});
+		return await open_application_form(interaction);
 
 	},
 };
 
+async function open_application_form(interaction) {
+	const user = await USER_MANAGER.find(interaction.user.id);
+
+	let servers;
+
+	if (USER_MANAGER.isStaff(interaction.user.id)) {
+		servers = await SERVER_MANAGER.gatherAppliableServersForStaff(user);
+	} else {
+		servers = await SERVER_MANAGER.gatherUserAppliableServers(user);
+	}
+
+	if (servers.length === 0) {
+		//No servers
+		return await interaction.reply({
+			content: "There are no Servers left for you to apply to!",
+			flags: MessageFlags.Ephemeral
+		});
+	}
+
+	let form;
+	if (!user) {
+		form = buildFullApplication(user, servers);
+	} else {
+		form = buildBasicApplication(user, servers);
+	}
+
+	return await interaction.showModal(form);
+}
 
 interactions.set(OPEN_FORM_ID,
 	async (interaction) => {
-
-		const user = await USER_MANAGER.find(interaction.user.id);
-
-		let servers;
-
-		if(USER_MANAGER.isStaff(interaction.user.id)){
-			servers = SERVER_MANAGER.gatherAppliableServersForStaff(user);
-		} else {
-			servers = SERVER_MANAGER.gatherUserAppliableServers(user);
-		}
-
-		if(servers.length === 0){
-			//No servers
-			return await interaction.reply({
-				content: "There are no Servers left for you to apply to!",
-				flags: MessageFlags.Ephemeral
-			});
-		}
-
-		let form;
-		if (!user) {
-			form = buildFullApplication(user, servers);
-		} else {
-			form = buildBasicApplication(user, servers);
-		}
-
-		return await interaction.showModal(form);
+		return await open_application_form(interaction);
 	}
 );
 
@@ -97,9 +89,16 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 
 		console.log(`Received application from ${user.username} ${member.nickname} (${user.id})`);
 
-		const server = interaction.fields.getStringSelectValues('server');
-		const mc_name = cleanInput(interaction.fields.getTextInputValue('ingameName'));
+		const serverName = interaction.fields.getStringSelectValues('server');
+		if (!serverName || serverName.length === 0) {
+			return await interaction.followUp({
+				content: "Invalid server name provided.",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 
+
+		const mc_name = cleanInput(interaction.fields.getTextInputValue('ingameName'));
 
 		const age = cleanIntegerInput(interaction.fields.getTextInputValue('age'));
 
@@ -127,6 +126,26 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 			});
 		}
 
+		const server = await SERVER_MANAGER.findServer(serverName);
+
+		if (!server) {
+			return await interaction.followUp({
+				content: "Selected server not found.",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+
+		if (!USER_MANAGER.isStaff(user.id)) {
+			const reject = await SERVER_MANAGER.isServerHiddenToUser(server, user.id);
+			console.log(reject);
+			if (reject) {
+				return await interaction.followUp({
+					content: "You do not have permission to apply for this server.",
+					flags: MessageFlags.Ephemeral,
+				});
+			}
+		}
+
 		const url = new URL(`https://api.ashcon.app/mojang/v2/user/${mc_name}/`);
 		const resp = await fetch(url.toString());
 		if (!resp.ok) {
@@ -141,8 +160,6 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 
 		const usedName = member.nickname ? member.nickname : user.username;
 
-		let submittedApplication;
-		let serverID;
 		let record;
 		try {
 			record = await USER_MANAGER.getOrCreate(
@@ -153,18 +170,24 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 				uuid,
 				mc_name
 			);
-
-
 			record.id;
 
-			console.log("User got");
+		} catch (e) {
+			console.error(`Error retreiving user record: ` + e);
+			return await interaction.followUp({
+				content: `An error occurred while creating your user record.`,
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 
-			serverID = server === "basics" ? 1 : 2; //TODO
+		let submittedApplication;
+
+		try {
 
 			submittedApplication = await APPLICATION_MANAGER.submit(
 				usedName,
 				record.id,
-				serverID,
+				server.id,
 				age,
 				"REASON PLACEHOLDER", //TODO: add reason input to form. If we want it.
 			);
@@ -190,7 +213,6 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 
 		const embed = SUBMISSION_EMBED.buildSubmission(
 			server,
-			serverID,
 			member.id,
 			mc_name,
 			record.age,
@@ -253,7 +275,7 @@ interactions.set(WHITELIST_SUBMIT_ID,
 			});
 		}
 
-		const server = SERVER_MANAGER.findServer(serverName);
+		const server = await SERVER_MANAGER.findServer(serverName);
 
 		if (!server) {
 			return await interaction.followUp({
@@ -262,11 +284,15 @@ interactions.set(WHITELIST_SUBMIT_ID,
 			});
 		}
 
-		if(SERVER_MANAGER.isServerHiddenToUser(server, user.id)) {
-			return await interaction.followUp({
-				content: "You do not have permission to apply for this server.",
-				flags: MessageFlags.Ephemeral,
-			});
+		if (!USER_MANAGER.isStaff(user.id)) {
+			const rejec = await SERVER_MANAGER.isServerHiddenToUser(server, user.id);
+			console.log(`somthn ${rejec}`);
+			if (rejec) {
+				return await interaction.followUp({
+					content: "You do not have permission to apply for this server.",
+					flags: MessageFlags.Ephemeral,
+				});
+			}
 		}
 
 		let record;
@@ -294,12 +320,12 @@ interactions.set(WHITELIST_SUBMIT_ID,
 		let submittedApplication;
 		try {
 
-			console.log("User applied to " + server);
+			console.log("User applied to " + server.name);
 
 			submittedApplication = await APPLICATION_MANAGER.submit(
 				record.name,
 				record.id,
-				serverID,
+				server.id,
 				record.age,
 				"REASON PLACEHOLDER", //TODO: add reason input to form. If we want it.
 			);
@@ -325,7 +351,6 @@ interactions.set(WHITELIST_SUBMIT_ID,
 
 		const embed = SUBMISSION_EMBED.buildSubmission(
 			server,
-			serverID,
 			user.id,
 			record.mcName,
 			record.age,
@@ -393,6 +418,14 @@ argumentedInteractions.set(ACCEPT_ID,
 
 		const application = await APPLICATION_MANAGER.update(cleanID, false, null, admin.id);
 
+		if (!application) {
+			const error = `Failed to find whitelist application from id ${cleanID}`;
+			console.error(error);
+			return await interaction.reply({
+				content: error,
+			});
+		}
+
 		const message = await interaction.client.submissions_channel.messages.fetch(application.messageID);
 
 		const oldEmbed = message.embeds[0];
@@ -408,23 +441,18 @@ argumentedInteractions.set(ACCEPT_ID,
 			embeds: [embed],
 		});
 
-		const field = oldEmbed.fields.find(field => field.name === 'Server');
-		const [serverIDDirty, serverName] = field.value.split(":");
 
-		const serverID = cleanIntegerInput(serverIDDirty);
-		if (serverID) {
+		const whitelistEntry = await WHITELIST_MANAGER.submit(application.userID, application.serverID);
 
-			const whitelistEntry = await WHITELIST_MANAGER.submit(application.userID, serverID);
+		if (whitelistEntry) {
+			//SUCCESS
+			const msg = await interaction.reply({ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
+			await msg.delete();
+			return;
+		};
 
-			if (whitelistEntry) {
-				//SUCCESS
-				const msg = await interaction.reply({ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
-				await msg.delete();
-				return;
-			};
-		}
 
-		const error = `Failed to create whitelist entry for user ${application.userID} on server ${serverID}`;
+		const error = `Failed to create whitelist entry for user ${application.userID} on server ${application.serverID}`;
 		console.error(error);
 		return await interaction.reply({
 			content: error,
@@ -482,8 +510,6 @@ argumentedInteractions.set(REJECT_REASON_ID,
 			});
 		}
 
-		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
 
 		const reason = interaction.fields.getTextInputValue('reason');
 		const application = await APPLICATION_MANAGER.update(cleanID, true, reason, admin.id);
@@ -507,7 +533,7 @@ argumentedInteractions.set(REJECT_REASON_ID,
 			embeds: [embed],
 		});
 
-		const statusResponse = await interaction.followUp({
+		const statusResponse = await interaction.reply({
 			content: `Application ${id} Rejected!`,
 		});
 
