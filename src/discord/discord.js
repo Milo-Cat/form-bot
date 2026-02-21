@@ -51,6 +51,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         message: ""
     }
 
+    //console.log(interaction.customId);
     if (interaction.isCommand()) {
         commandResponse = await handleCommand(interaction, commandResponse);
     } else if (interaction.customId.includes(":")) {
