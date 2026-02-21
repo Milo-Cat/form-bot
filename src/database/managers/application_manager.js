@@ -14,6 +14,7 @@ module.exports.submit = async (name, userId, serverId, age, applicationReason) =
     });
 
     if (oldApplication) {
+        console.log("Error: Pending application found!");
         return null;//user already has a pending or approved application for this server
     };
 
