@@ -3,7 +3,8 @@ const {
 } = require('discord.js');
 const UTILITY = require('../cmnd_resources.js');
 const { USER_MANAGER,
-    SERVER_MANAGER
+    SERVER_MANAGER,
+    APPLICATION_MANAGER
 } = UTILITY.DATABASE;
 
 
@@ -58,16 +59,31 @@ async function getServers(interaction) {
     let servers;
 
     if (USER_MANAGER.isStaff(interaction.user.id)) {
-        servers = SERVER_MANAGER.allServers();
+        servers = await SERVER_MANAGER.allServers();
     } else {
-        servers = SERVER_MANAGER.gatherViewableServers(user);
+        servers = await SERVER_MANAGER.gatherViewableServers(user);
     }
+
+    for(const server of servers){
+        const result = await APPLICATION_MANAGER.getStatus(user, server);
+
+        console.log(result);
+        if(result === 'approved'){
+            server.colour = '#00c410'
+        } else if(result === 'rejected') {
+            server.colour = '#e63a10'
+        }
+        
+    }
+
 
     return servers;
 }
 
 
 function buildEmbed(server, showInternalName) {
+
+    const colour = server.colour || '#1539da';
     
     const embedFields = [
         {
@@ -100,7 +116,7 @@ function buildEmbed(server, showInternalName) {
     }
 
     const embed = new EmbedBuilder()
-        .setColor('#1539da')
+        .setColor(colour)
         .setTitle(server.title)
         .addFields(...embedFields);
     
