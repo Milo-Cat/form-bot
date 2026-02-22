@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags, EmbedBuilder } = require('discord.js');
 const UTILITY = require('../cmnd_resources.js');
 const { USER_MANAGER } = UTILITY.DATABASE;
 const { cleanInput, cleanIntegerInput } = UTILITY.CLEANERS;
