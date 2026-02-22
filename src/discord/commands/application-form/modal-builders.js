@@ -36,10 +36,6 @@ const ageLabel = new LabelBuilder()
 	.setTextInputComponent(age);
 
 
-const text = new TextDisplayBuilder().setContent(
-	'Text that could not fit in to a label or description\n-# Markdown can also be used',
-);
-
 function buildServerSelectOptionsLabel(servers) {
 	const options = [];
 
@@ -70,8 +66,7 @@ function buildFullApplication(user, servers) {
 
 	const fullApplication = new ModalBuilder().setCustomId(WHITELIST_SUBMIT_ID_FULL).setTitle('Apply!');
 
-	fullApplication.addLabelComponents(ingameNameLabel, serverSelectLabel, ageLabel)
-		.addTextDisplayComponents(text);
+	fullApplication.addLabelComponents(ingameNameLabel, serverSelectLabel, ageLabel);
 	return fullApplication;
 }
 
@@ -94,8 +89,7 @@ ${user.age}`
 	return new ModalBuilder()
 		.setCustomId(WHITELIST_SUBMIT_ID).setTitle('Apply!')
 		.addTextDisplayComponents(userInfo)
-		.addLabelComponents(serverSelectLabel)
-		.addTextDisplayComponents(text);
+		.addLabelComponents(serverSelectLabel);
 
 }
 
