@@ -28,6 +28,7 @@ registery.commands.forEach((command) => {
 
 //ready event
 client.on(Events.ClientReady, async (readyClient) => {
+    console.log(`Bot Ready`);
     console.log(`Discord Ready! Logged in as ${readyClient.user.tag}`);
 
     const guild = await client.guilds.fetch(SERVER_ID);
