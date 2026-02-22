@@ -459,6 +459,9 @@ argumentedInteractions.set(ACCEPT_ID,
 			await msg.delete();
 
 			await sendUserMessage(application, interaction, "approved!");
+
+			await SERVER_MANAGER.attemptWhitelist();
+			
 			return;
 		};
 
