@@ -86,7 +86,14 @@ module.exports = {
 		}
 
 		return await interaction.reply({
-				content: `User registered successfully!\nName:${user.username}\nDiscordID: ${user.id}\nAge: ${age} \nUUID: ${uuid} \nMC Name: ${mc_name}`,
+				embeds: [new EmbedBuilder().setColor('#1539da')
+								.setTitle(`User registered successfully!`)
+								.addFields(
+            						{ name: 'Discord', value: `<@${user.id}>` },
+									{ name: 'MC Name', value: `${mc_name}` },
+            						{ name: 'MC UUID', value: `${uuid}` },
+									{ name: 'Age', value: `${age}` },
+        				)],
 				flags: MessageFlags.SuppressNotifications,
 			});
 
