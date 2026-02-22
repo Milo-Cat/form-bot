@@ -455,8 +455,8 @@ argumentedInteractions.set(ACCEPT_ID,
 
 		if (whitelistEntry) {
 			//SUCCESS
-			const msg = await interaction.reply();/*{ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
-			await msg.delete();*/
+			const msg = await interaction.reply({ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
+			await msg.delete();
 
 			await sendUserMessage(application, interaction, "approved!");
 
@@ -552,12 +552,11 @@ argumentedInteractions.set(REJECT_REASON_ID,
 			embeds: [embed],
 		});
 
-		const statusResponse = await interaction.deferReply();
-		/*{
+		const statusResponse = await interaction.deferReply({
 			content: `Application ${id} Rejected!`,
 		});
 
-		await statusResponse.delete();*/
+		await statusResponse.delete();
 		
 
 		await sendUserMessage(application, interaction, `rejected!\nReason: ${reason}`);
