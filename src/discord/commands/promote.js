@@ -177,7 +177,7 @@ interactions.set(SUBMIT_PROMOTE_MENU,
             await USER_MANAGER.demoteAdmin(user.id);
             return await interaction.reply({
                 embeds: [new EmbedBuilder().setColor('#1539da')
-                    .setTitle(`User <@!${discordId}> has been demoted!`)],
+                    .setTitle(`User <@${discordId}> has been demoted!`)],
                 flags: MessageFlags.SuppressNotifications,
             });
         }
@@ -186,7 +186,7 @@ interactions.set(SUBMIT_PROMOTE_MENU,
 
         return await interaction.reply({
             embeds: [new EmbedBuilder().setColor('#1539da')
-                .setTitle(`User <@!${discordId}> has been promoted to ${rank}!`)],
+                .setTitle(`User <@${discordId}> has been promoted to ${rank}!`)],
             flags: MessageFlags.SuppressNotifications,
         });
 
