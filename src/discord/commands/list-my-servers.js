@@ -130,9 +130,9 @@ function buildEmbed(server, showInternalName) {
 function formatLoader(loader) {
     switch (loader) {
         case 'fabric':
-            return ":fabric: Fabric";
+            return `${FABRIC} Fabric`;
         case 'forge':
-            return ":forge: Forge";
+            return `${FORGE} Forge`;
         default:
             return loader;
     }
