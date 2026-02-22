@@ -26,6 +26,5 @@ module.exports.buildAgeWarning = (discord, game_uuid, age) => {
             { name: 'Age', value: `${age}` },
             { name: 'Discord', value: `<@${discord}>` },
             { name: 'Game UUID', value: `${game_uuid}` },
-        )
-        .setThumbnail(`:exclamation:`);
+        );
 }
