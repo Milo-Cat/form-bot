@@ -1,9 +1,9 @@
 const crypto = require('crypto');
 const {
-	SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder,
-	ButtonBuilder, ButtonStyle, ButtonInteraction, ModalBuilder,
-	TextInputBuilder, LabelBuilder, TextDisplayBuilder, StringSelectMenuOptionBuilder,
-	TextInputStyle, MessageFlags, EmbedBuilder
+    SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder,
+    ButtonBuilder, ButtonStyle, ButtonInteraction, ModalBuilder,
+    TextInputBuilder, LabelBuilder, TextDisplayBuilder, StringSelectMenuOptionBuilder,
+    TextInputStyle, MessageFlags, EmbedBuilder
 } = require('discord.js');
 const UTILITY = require('../cmnd_resources.js');
 const { USER_MANAGER } = UTILITY.DATABASE;
@@ -127,10 +127,10 @@ module.exports = {
 interactions.set(SUBMIT_PROMOTE_MENU,
     async (interaction) => {
         if (!interaction.isModalSubmit()) {
-			console.error("\x1b[31mInteraction is not a modal submit!\x1b[0m");
-			return;
-		}
-        if(!await USER_MANAGER.isAdmin(interaction.user.id)) {
+            console.error("\x1b[31mInteraction is not a modal submit!\x1b[0m");
+            return;
+        }
+        if (!await USER_MANAGER.isAdmin(interaction.user.id)) {
             return await interaction.reply({
                 content: "You do not have permission to use this command.",
                 flags: MessageFlags.Ephemeral,
@@ -172,11 +172,12 @@ interactions.set(SUBMIT_PROMOTE_MENU,
                 flags: MessageFlags.Ephemeral,
             });
         }
-        
+
         if (rank === 'demote') {
             await USER_MANAGER.demoteAdmin(user.id);
             return await interaction.reply({
-                content: `User <@!${discordId}> has been demoted!`,
+                embeds: [new EmbedBuilder().setColor('#1539da')
+                    .setTitle(`User <@!${discordId}> has been demoted!`)],
                 flags: MessageFlags.SuppressNotifications,
             });
         }
@@ -184,7 +185,8 @@ interactions.set(SUBMIT_PROMOTE_MENU,
         await USER_MANAGER.promoteAdmin(user.id, rank, discordId);
 
         return await interaction.reply({
-            content: `User <@!${discordId}> has been promoted to ${rank}!`,
+            embeds: [new EmbedBuilder().setColor('#1539da')
+                .setTitle(`User <@!${discordId}> has been promoted to ${rank}!`)],
             flags: MessageFlags.SuppressNotifications,
         });
 
