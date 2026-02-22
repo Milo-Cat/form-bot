@@ -111,10 +111,6 @@ module.exports = {
 
             console.log(`\x1b[34mPromotion request for user with Discord ID ${discordId}.\x1b[0m \nAuthentication key: \x1b[33m${authEntry.authKey}\x1b[0m`);
 
-            interaction.client.submissions_channel.send({
-				content: `Promotion request for user with Discord ID ${discordId}.\nAuthentication key: ${authEntry.authKey}`
-			});
-
             const form = buildPromotionForm(discordId);
 
             return await interaction.showModal(form);
