@@ -359,6 +359,7 @@ interactions.set(WHITELIST_SUBMIT_ID,
 
 
 		const sentMessage = await interaction.client.submissions_channel.send({
+			content: `<@!${user.id}>`,
 			embeds: [embed],
 			components: [
 				new ActionRowBuilder().addComponents(
@@ -445,16 +446,18 @@ argumentedInteractions.set(ACCEPT_ID,
 				{ name: 'Reviewed By', value: `<@${reviewerId}>` }
 			);
 
-		await message.edit({
-			components: [],
-			embeds: [embed],
-		});
-
 
 		const whitelistEntry = await WHITELIST_MANAGER.submit(application.userID, application.serverID);
 
 		if (whitelistEntry) {
 			//SUCCESS
+
+			await message.edit({
+				content: ``,
+				components: [],
+				embeds: [embed],
+				});
+
 			const msg = await interaction.reply({ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
 			await msg.delete();
 
@@ -540,7 +543,7 @@ argumentedInteractions.set(REJECT_REASON_ID,
 
 		const oldEmbed = message.embeds[0];
 		const embed = EmbedBuilder.from(oldEmbed)
-			.setColor('#e63a10')
+			.setColor('#030303')
 			.setFields(
 				...oldEmbed.fields,
 				{ name: 'Reviewed By', value: `<@${reviewerId}>` },
@@ -548,6 +551,7 @@ argumentedInteractions.set(REJECT_REASON_ID,
 			);
 
 		await message.edit({
+			content: ``,
 			components: [],
 			embeds: [embed],
 		});
