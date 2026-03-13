@@ -40,8 +40,7 @@ module.exports = {
                 .setImage(`https://mc-heads.net/body/${uuid}/100`);
 
         await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
+            embeds: [embed]
         });
     },
 };
