@@ -72,6 +72,16 @@ interactions.set(OPEN_FORM_ID,
 	}
 );
 
+const jank_awake_messages = [
+	"Polish that hammer!", "Somone has been naughty",
+	 "Snitch bot activated", "It's your favourite activity!",
+	"Awaken the Monke", "Get his A**"];
+function getRandomJankoMsg() {
+  const index = Math.floor(Math.random() * jank_awake_messages.length);
+  return jank_awake_messages[index];
+}
+
+
 interactions.set(WHITELIST_SUBMIT_ID_FULL,
 	async (interaction) => {
 		if (!interaction.isModalSubmit()) {
@@ -104,7 +114,7 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 
 		if (age === null || isNaN(age)) {
 			return await interaction.followUp({
-				content: `Invalid Age. <${ageInput}> \nPlease Resubmit Form with a valid age.`,
+				content: "Input Validation Error. \nAn error occured whilst processing your application.\n Please contact staff here: <#1060997835304218655>",
 				flags: MessageFlags.Ephemeral,
 			});
 		}
@@ -116,11 +126,12 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 			);
 
 			interaction.client.submissions_channel.send({
+				content: `<@718065743027109978> ${getRandomJankoMsg()}`,
 				embeds: [embed],
 			});
 
 			return await interaction.followUp({
-				content: "Discord's Terms of Service require you to be at least 13 years old to use Discord. \nYour application has been rejected and this infraction has been logged.",
+				content: "Input Validation Error. \nAn error occured whilst processing your application.\n Please contact staff here: <#1060997835304218655>",
 				flags: MessageFlags.Ephemeral,
 				embeds: [embed],
 			});
