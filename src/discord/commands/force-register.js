@@ -29,7 +29,7 @@ module.exports = {
 
 		const user = interaction.options.getUser('user');
 		const age = cleanIntegerInput(interaction.options.getString('age'));
-		const mc_name = cleanInput(interaction.options.getString('mc_name'));
+		let mc_name = cleanInput(interaction.options.getString('mc_name'));
 
 		if(!age) {
 			return await interaction.reply({
@@ -61,6 +61,7 @@ module.exports = {
 				flags: MessageFlags.Ephemeral,
 			});
 		}
+  mc_name = data.username;
 
 		
 		let record;
