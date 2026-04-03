@@ -108,7 +108,7 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 		}
 
 
-		const mc_name = cleanInput(interaction.fields.getTextInputValue('ingameName'));
+		let mc_name = cleanInput(interaction.fields.getTextInputValue('ingameName'));
 
 		const age = cleanIntegerInput(interaction.fields.getTextInputValue('age'));
 
@@ -167,7 +167,7 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 		}
 		const data = await resp.json();
 		const uuid = data.uuid;
-
+  mc_name = data.username;
 
 		const usedName = member.nickname ? member.nickname : user.username;
 
