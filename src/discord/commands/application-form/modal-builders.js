@@ -26,8 +26,8 @@ const age = new TextInputBuilder()
 
 
 const ingameNameLabel = new LabelBuilder()
-	.setLabel('What is your ingame name?')
-	.setDescription('Your Minecraft username')
+	.setLabel('What is your ingame name or UUID?')
+	.setDescription('Your Minecraft username/UUID')
 	.setTextInputComponent(ingameName);
 
 const ageLabel = new LabelBuilder()

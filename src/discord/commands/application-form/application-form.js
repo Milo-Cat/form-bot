@@ -72,6 +72,16 @@ interactions.set(OPEN_FORM_ID,
 	}
 );
 
+const jank_awake_messages = [
+	"Polish that hammer!", "Somone has been naughty",
+	 "Snitch bot activated", "It's your favourite activity!",
+	"Awaken the Monke", "Get his A**"];
+function getRandomJankoMsg() {
+  const index = Math.floor(Math.random() * jank_awake_messages.length);
+  return jank_awake_messages[index];
+}
+
+
 interactions.set(WHITELIST_SUBMIT_ID_FULL,
 	async (interaction) => {
 		if (!interaction.isModalSubmit()) {
@@ -98,13 +108,13 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 		}
 
 
-		const mc_name = cleanInput(interaction.fields.getTextInputValue('ingameName'));
+		let mc_name = cleanInput(interaction.fields.getTextInputValue('ingameName'));
 
 		const age = cleanIntegerInput(interaction.fields.getTextInputValue('age'));
 
 		if (age === null || isNaN(age)) {
 			return await interaction.followUp({
-				content: `Invalid Age. <${ageInput}> \nPlease Resubmit Form with a valid age.`,
+				content: "Input Validation Error. \nAn error occured whilst processing your application.\n Please contact staff here: <#1060997835304218655>",
 				flags: MessageFlags.Ephemeral,
 			});
 		}
@@ -116,11 +126,12 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 			);
 
 			interaction.client.submissions_channel.send({
+				content: `<@718065743027109978> ${getRandomJankoMsg()}`,
 				embeds: [embed],
 			});
 
 			return await interaction.followUp({
-				content: "Discord's Terms of Service require you to be at least 13 years old to use Discord. \nYour application has been rejected and this infraction has been logged.",
+				content: "Input Validation Error. \nAn error occured whilst processing your application.\n Please contact staff here: <#1060997835304218655>",
 				flags: MessageFlags.Ephemeral,
 				embeds: [embed],
 			});
@@ -156,7 +167,7 @@ interactions.set(WHITELIST_SUBMIT_ID_FULL,
 		}
 		const data = await resp.json();
 		const uuid = data.uuid;
-
+  mc_name = data.username;
 
 		const usedName = member.nickname ? member.nickname : user.username;
 
@@ -359,6 +370,7 @@ interactions.set(WHITELIST_SUBMIT_ID,
 
 
 		const sentMessage = await interaction.client.submissions_channel.send({
+			content: `<@!${user.id}>`,
 			embeds: [embed],
 			components: [
 				new ActionRowBuilder().addComponents(
@@ -445,23 +457,25 @@ argumentedInteractions.set(ACCEPT_ID,
 				{ name: 'Reviewed By', value: `<@${reviewerId}>` }
 			);
 
-		await message.edit({
-			components: [],
-			embeds: [embed],
-		});
-
 
 		const whitelistEntry = await WHITELIST_MANAGER.submit(application.userID, application.serverID);
 
 		if (whitelistEntry) {
 			//SUCCESS
+
+			await message.edit({
+				content: ``,
+				components: [],
+				embeds: [embed],
+				});
+
 			const msg = await interaction.reply({ content: `Application approved!`, flags: MessageFlags.SuppressNotifications });
 			await msg.delete();
 
 			await sendUserMessage(application, interaction, "approved!");
 
 			await SERVER_MANAGER.attemptWhitelist();
-			
+
 			return;
 		};
 
@@ -540,7 +554,7 @@ argumentedInteractions.set(REJECT_REASON_ID,
 
 		const oldEmbed = message.embeds[0];
 		const embed = EmbedBuilder.from(oldEmbed)
-			.setColor('#e63a10')
+			.setColor('#030303')
 			.setFields(
 				...oldEmbed.fields,
 				{ name: 'Reviewed By', value: `<@${reviewerId}>` },
@@ -548,11 +562,12 @@ argumentedInteractions.set(REJECT_REASON_ID,
 			);
 
 		await message.edit({
+			content: ``,
 			components: [],
 			embeds: [embed],
 		});
 
-		const statusResponse = await interaction.reply({
+		const statusResponse = await interaction.deferReply({
 			content: `Application ${id} Rejected!`,
 		});
 

@@ -32,16 +32,15 @@ module.exports = {
 
         const embed = new EmbedBuilder()
                 .setColor('#1539da')
-                .setTitle(mc_name)
+                .setTitle(data.username)
                 .addFields(
-                    { name: 'UUID', value: `${uuid}` },
+                    { name: 'UUID', value: `${data.username}` },
                 )
                 .setThumbnail(`https://mc-heads.net/Head/${uuid}`)
                 .setImage(`https://mc-heads.net/body/${uuid}/100`);
 
         await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
+            embeds: [embed]
         });
     },
 };
