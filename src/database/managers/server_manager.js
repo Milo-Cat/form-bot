@@ -153,7 +153,7 @@ module.exports.gatherUserAppliableServers = async (user) => {//USER as in user r
     const foundServers = await rankViewableServers(userRankIds);
 
     const allViewable = foundServers
-        .filter(server => !appliedServerIds.includes(server.id));
+        .filter(server => !appliedServerIds.includes(server.id) && server.whitelistRequired);
 
     return allViewable;
 }
