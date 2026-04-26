@@ -42,6 +42,8 @@ function buildServerSelectOptionsLabel(servers) {
 
 	for (const server of servers) {
 
+		if(!server.whitelistRequired) continue;
+
 		let descriptionTruncated = server.description || "...";
 		if (descriptionTruncated.length > 100) {
     		descriptionTruncated = descriptionTruncated.substring(0, 97) + "...";
