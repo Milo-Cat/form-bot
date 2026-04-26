@@ -39,7 +39,7 @@ const ageLabel = new LabelBuilder()
 function buildServerSelectOptionsLabel(servers) {
 	const options = [];
 
-	let descriptionTruncated = server.description;
+	let descriptionTruncated = servers.description;
 	if (descriptionTruncated.length > 100) {
     	descriptionTruncated = descriptionTruncated.substring(0, 97) + "...";
 	}
