@@ -100,7 +100,11 @@ function buildEmbed(server, showInternalName) {
         },
         {
         name: "Modpack Link",
-        value: `${formatLink(server.modpackURL)}  V${server.modpackVersion}`
+        value: `${formatLink(server.modpackURL)}  ${server.modpackVersion}`
+        },
+        {
+        name: "Whitelist",
+        value: server.whitelistRequired ? `Enabled` : "Disabled"
         }
     ]
 
